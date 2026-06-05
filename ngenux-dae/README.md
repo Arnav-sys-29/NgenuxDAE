@@ -2,7 +2,7 @@
 
 The Ngenux DAE is a robust, Python-based rules engine designed to automate complex business decisions. It evaluates structured inputs against configurable policies and provides consistent, trackable outcomes with full audit logging and metadata tracking (latency, cost, and rule provenance).
 
-## 🚀 Getting Started (Quickstart for Mentors)
+##  Getting Started 
 
 This project is **100% Dockerized**. You do not need to install Python, virtual environments, or a database locally.
 
