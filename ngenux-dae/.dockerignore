@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Test artifacts
+.pytest_cache/
+test_ngenux.db
+
+# Dev database
+ngenux.db
+
+# IDE
+.vscode/
+.idea/
+
+# Alembic versions (migrations are run at container startup)
+# Keep this commented if you want to include them in the image
+# alembic/versions/
+
+# Env files
+.env
+*.env
