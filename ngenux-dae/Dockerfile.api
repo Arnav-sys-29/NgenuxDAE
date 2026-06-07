@@ -34,6 +34,7 @@ COPY --from=builder /install /usr/local
 COPY app/ ./app/
 COPY alembic/ ./alembic/
 COPY alembic.ini ./
+COPY seed_policy.py ./
 
 # Non-root user for security
 RUN useradd -m appuser
