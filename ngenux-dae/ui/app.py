@@ -27,15 +27,37 @@ def apply_custom_css():
             }
 
             section[data-testid="stSidebar"] {
-                background-color: rgba(20, 20, 30, 0.4) !important;
+                background-color: rgba(20, 20, 30, 0.85) !important;
                 backdrop-filter: blur(12px) !important;
                 -webkit-backdrop-filter: blur(12px) !important;
-                border-right: 1px solid rgba(255, 255, 255, 0.05);
+                border-right: 1px solid rgba(255, 255, 255, 0.08);
+            }
+
+            /* Force all sidebar text to be visible */
+            section[data-testid="stSidebar"] * {
+                color: #e0e0e0 !important;
+            }
+            section[data-testid="stSidebar"] label,
+            section[data-testid="stSidebar"] p,
+            section[data-testid="stSidebar"] span {
+                color: #c8c8d8 !important;
+            }
+            /* Sidebar selectbox */
+            section[data-testid="stSidebar"] .stSelectbox > div > div {
+                background-color: rgba(40, 40, 60, 0.8) !important;
+                color: #ffffff !important;
+                border: 1px solid rgba(255,255,255,0.15) !important;
             }
 
             #MainMenu {visibility: hidden;}
             header {visibility: hidden;}
             footer {visibility: hidden;}
+
+            /* Hide sidebar collapse/expand button */
+            button[data-testid="collapsedControl"],
+            div[data-testid="collapsedControl"] {
+                display: none !important;
+            }
 
             div.stButton > button {
                 background: linear-gradient(135deg, rgba(100, 50, 200, 0.8), rgba(50, 100, 200, 0.8));
