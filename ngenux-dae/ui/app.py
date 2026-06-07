@@ -10,10 +10,102 @@ st.set_page_config(page_title="Ngenux DAE Manager", layout="wide")
 # Backend API URL — overridden by API_BASE_URL env var in Docker
 API_BASE_URL = os.environ.get("API_BASE_URL", "http://localhost:8000")
 
+def apply_custom_css():
+    st.markdown("""
+        <style>
+            /* Import Google Fonts */
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+            /* Global Typography */
+            html, body, [class*="css"]  {
+                font-family: 'Inter', sans-serif !important;
+            }
+
+            /* Ambient Background - Dark with subtle moving gradient glow */
+            .stApp {
+                background: radial-gradient(circle at 15% 50%, rgba(45, 20, 75, 0.6), rgba(15, 15, 20, 1) 40%),
+                            radial-gradient(circle at 85% 30%, rgba(20, 60, 80, 0.5), rgba(15, 15, 20, 1) 40%);
+                background-color: #0d0d12;
+                color: #e0e0e0;
+            }
+
+            /* Sidebar Glassmorphism */
+            section[data-testid="stSidebar"] {
+                background-color: rgba(20, 20, 30, 0.4) !important;
+                backdrop-filter: blur(12px) !important;
+                -webkit-backdrop-filter: blur(12px) !important;
+                border-right: 1px solid rgba(255, 255, 255, 0.05);
+            }
+
+            /* Hide Streamlit elements */
+            #MainMenu {visibility: hidden;}
+            header {visibility: hidden;}
+            footer {visibility: hidden;}
+
+            /* Smooth Ambient Button Animations */
+            div.stButton > button {
+                background: linear-gradient(135deg, rgba(100, 50, 200, 0.8), rgba(50, 100, 200, 0.8));
+                color: white !important;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 8px;
+                padding: 0.6rem 1.2rem;
+                font-weight: 600;
+                transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            }
+            div.stButton > button:hover {
+                transform: translateY(-2px) scale(1.02);
+                box-shadow: 0 8px 25px rgba(100, 100, 250, 0.5);
+                border-color: rgba(255, 255, 255, 0.3);
+            }
+            div.stButton > button:active {
+                transform: translateY(1px) scale(0.98);
+            }
+
+            /* Input fields and Dropdowns */
+            .stTextInput > div > div > input, .stTextArea > div > textarea, .stSelectbox > div > div {
+                background-color: rgba(30, 30, 45, 0.6) !important;
+                color: #fff !important;
+                border: 1px solid rgba(255, 255, 255, 0.1) !important;
+                border-radius: 6px !important;
+                transition: all 0.2s ease !important;
+            }
+            .stTextInput > div > div > input:focus, .stTextArea > div > textarea:focus, .stSelectbox > div > div:focus {
+                border-color: rgba(100, 150, 255, 0.5) !important;
+                box-shadow: 0 0 10px rgba(100, 150, 255, 0.2) !important;
+            }
+
+            /* Metric Cards Glassmorphism and Hover */
+            div[data-testid="stMetric"] {
+                background: rgba(30, 30, 40, 0.5);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.05);
+                border-radius: 12px;
+                padding: 1rem;
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+            }
+            div[data-testid="stMetric"]:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3), 0 0 15px rgba(100, 150, 255, 0.15);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            
+            /* JSON and DataFrame Backgrounds */
+            .stDataFrame, div[data-testid="stJson"] {
+                background: rgba(20, 20, 30, 0.4) !important;
+                border-radius: 8px;
+                padding: 0.5rem;
+            }
+        </style>
+    """, unsafe_allow_html=True)
+
+apply_custom_css()
+
 st.title("Ngenux DAE Manager")
 
-# Sidebar navigation
-view = st.sidebar.radio(
+# Sidebar navigation via dropdown
+view = st.sidebar.selectbox(
     "Navigation",
     ["Execute Decision", "List Decisions", "Decision Detail"]
 )
