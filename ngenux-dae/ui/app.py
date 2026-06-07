@@ -13,15 +13,12 @@ API_BASE_URL = os.environ.get("API_BASE_URL", "http://localhost:8000")
 def apply_custom_css():
     st.markdown("""
         <style>
-            /* Import Google Fonts */
             @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
 
-            /* Global Typography */
-            html, body, [class*="css"]  {
+            html, body, [class*="css"] {
                 font-family: 'Inter', sans-serif !important;
             }
 
-            /* Ambient Background - Dark with subtle moving gradient glow */
             .stApp {
                 background: radial-gradient(circle at 15% 50%, rgba(45, 20, 75, 0.6), rgba(15, 15, 20, 1) 40%),
                             radial-gradient(circle at 85% 30%, rgba(20, 60, 80, 0.5), rgba(15, 15, 20, 1) 40%);
@@ -29,7 +26,6 @@ def apply_custom_css():
                 color: #e0e0e0;
             }
 
-            /* Sidebar Glassmorphism */
             section[data-testid="stSidebar"] {
                 background-color: rgba(20, 20, 30, 0.4) !important;
                 backdrop-filter: blur(12px) !important;
@@ -37,12 +33,10 @@ def apply_custom_css():
                 border-right: 1px solid rgba(255, 255, 255, 0.05);
             }
 
-            /* Hide Streamlit elements */
             #MainMenu {visibility: hidden;}
             header {visibility: hidden;}
             footer {visibility: hidden;}
 
-            /* Smooth Ambient Button Animations */
             div.stButton > button {
                 background: linear-gradient(135deg, rgba(100, 50, 200, 0.8), rgba(50, 100, 200, 0.8));
                 color: white !important;
@@ -62,20 +56,21 @@ def apply_custom_css():
                 transform: translateY(1px) scale(0.98);
             }
 
-            /* Input fields and Dropdowns */
-            .stTextInput > div > div > input, .stTextArea > div > textarea, .stSelectbox > div > div {
+            .stTextInput > div > div > input,
+            .stTextArea > div > textarea,
+            .stSelectbox > div > div {
                 background-color: rgba(30, 30, 45, 0.6) !important;
                 color: #fff !important;
                 border: 1px solid rgba(255, 255, 255, 0.1) !important;
                 border-radius: 6px !important;
                 transition: all 0.2s ease !important;
             }
-            .stTextInput > div > div > input:focus, .stTextArea > div > textarea:focus, .stSelectbox > div > div:focus {
+            .stTextInput > div > div > input:focus,
+            .stTextArea > div > textarea:focus {
                 border-color: rgba(100, 150, 255, 0.5) !important;
                 box-shadow: 0 0 10px rgba(100, 150, 255, 0.2) !important;
             }
 
-            /* Metric Cards Glassmorphism and Hover */
             div[data-testid="stMetric"] {
                 background: rgba(30, 30, 40, 0.5);
                 backdrop-filter: blur(10px);
@@ -90,8 +85,7 @@ def apply_custom_css():
                 box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3), 0 0 15px rgba(100, 150, 255, 0.15);
                 border: 1px solid rgba(255, 255, 255, 0.1);
             }
-            
-            /* JSON and DataFrame Backgrounds */
+
             .stDataFrame, div[data-testid="stJson"] {
                 background: rgba(20, 20, 30, 0.4) !important;
                 border-radius: 8px;
@@ -102,6 +96,33 @@ def apply_custom_css():
 
 apply_custom_css()
 
+# ── Decision type templates (auto-populate facts JSON) ────────────────────────
+DECISION_TEMPLATES = {
+    "LOAN_APPROVAL": {
+        "credit_score": 750,
+        "income": 50000
+    },
+    "HR_HIRING": {
+        "years_experience": 3,
+        "degree": "Bachelor"
+    },
+    "INSURANCE_CLAIM": {
+        "claim_amount": 20000,
+        "days_since_incident": 10,
+        "policy_active": True
+    },
+    "VENDOR_ONBOARDING": {
+        "compliance_score": 80,
+        "years_in_business": 4,
+        "blacklisted": False
+    },
+    "EMPLOYEE_LEAVE": {
+        "days_requested": 5,
+        "notice_days_given": 3,
+        "leave_balance_remaining": 12
+    }
+}
+
 st.title("Ngenux DAE Manager")
 
 # Sidebar navigation via dropdown
@@ -110,29 +131,41 @@ view = st.sidebar.selectbox(
     ["Execute Decision", "List Decisions", "Decision Detail"]
 )
 
-# --- Execute Decision View ---
+# ─────────────────────────────────────────────────────────────────────────────
+# VIEW 1: Execute Decision
+# ─────────────────────────────────────────────────────────────────────────────
 if view == "Execute Decision":
     st.header("Execute Decision")
-    
+
+    # Decision type dropdown OUTSIDE the form so it reactively changes the JSON
+    col1, col2 = st.columns(2)
+    request_id = col1.text_input("Request ID", value=f"REQ-{datetime.now().strftime('%Y%m%d%H%M%S')}")
+    decision_type = col2.selectbox(
+        "Decision Type",
+        list(DECISION_TEMPLATES.keys())
+    )
+
+    # Auto-populate the facts JSON when the decision type changes
+    default_facts = json.dumps(DECISION_TEMPLATES[decision_type], indent=2)
+
     with st.form("execute_decision_form"):
-        st.subheader("Request Info")
-        col1, col2 = st.columns(2)
-        request_id = col1.text_input("Request ID", value=f"REQ-{datetime.now().strftime('%Y%m%d%H%M%S')}")
-        decision_type = col2.text_input("Decision Type", value="LOAN_APPROVAL")
-        
         st.subheader("Actor Info")
         col3, col4 = st.columns(2)
         actor_id = col3.text_input("Actor ID", value="system_agent_1")
         actor_role = col4.text_input("Actor Role", value="system")
-        
+
         st.subheader("Policy Reference")
         policy_version = st.text_input("Policy Version", value="v1.0")
-        
+
         st.subheader("Context Facts")
-        facts_json = st.text_area("Facts (JSON Format)", value='{"credit_score": 750, "income": 50000}')
-        
-        submitted = st.form_submit_button("Submit Decision Request")
-        
+        facts_json = st.text_area(
+            "Facts (JSON Format — auto-populated from selected type)",
+            value=default_facts,
+            height=160
+        )
+
+        submitted = st.form_submit_button("🚀 Submit Decision Request")
+
         if submitted:
             try:
                 facts_dict = json.loads(facts_json)
@@ -152,29 +185,35 @@ if view == "Execute Decision":
                         "facts": facts_dict
                     }
                 }
-                
+
                 response = requests.post(f"{API_BASE_URL}/decisions", json=payload)
                 if response.status_code == 200:
-                    st.success("Decision successfully submitted!")
-                    st.json(response.json())
+                    result = response.json()
+                    status = result.get("status", "UNKNOWN")
+                    if status == "APPROVED" or status == "HIRED":
+                        st.success(f"✅ Decision Result: **{status}**")
+                    else:
+                        st.error(f"❌ Decision Result: **{status}**")
+                    st.json(result)
                 else:
                     st.error(f"Error submitting decision: {response.text}")
-                    
+
             except json.JSONDecodeError:
                 st.error("Invalid JSON provided in the Context Facts field.")
             except Exception as e:
                 st.error(f"An error occurred: {str(e)}")
 
-# --- List Decisions View ---
+# ─────────────────────────────────────────────────────────────────────────────
+# VIEW 2: List Decisions
+# ─────────────────────────────────────────────────────────────────────────────
 elif view == "List Decisions":
     st.header("Decision History")
-    
+
     try:
         response = requests.get(f"{API_BASE_URL}/decisions")
         if response.status_code == 200:
             decisions = response.json()
             if decisions:
-                # Format for display in a dataframe
                 display_data = []
                 for d in decisions:
                     display_data.append({
@@ -183,9 +222,7 @@ elif view == "List Decisions":
                         "Type": d["decision_type"],
                         "Status": d["status"]
                     })
-                
                 st.dataframe(display_data, use_container_width=True)
-                
                 st.info("To view details, copy a Decision ID and navigate to the 'Decision Detail' view.")
             else:
                 st.write("No decisions found in the database.")
@@ -194,28 +231,28 @@ elif view == "List Decisions":
     except requests.exceptions.ConnectionError:
         st.error("Could not connect to the backend. Is the FastAPI server running?")
 
-# --- Decision Detail View ---
+# ─────────────────────────────────────────────────────────────────────────────
+# VIEW 3: Decision Detail
+# ─────────────────────────────────────────────────────────────────────────────
 elif view == "Decision Detail":
     st.header("Decision Detail")
-    
+
     st.write("Enter a Decision ID to view its complete logs and payload.")
     decision_id_input = st.text_input("Decision ID")
-    
+
     if st.button("Fetch Details") and decision_id_input:
         try:
             response = requests.get(f"{API_BASE_URL}/decisions/{decision_id_input}")
             if response.status_code == 200:
                 detail = response.json()
-                
-                # Top metrics
+
                 col1, col2, col3 = st.columns(3)
                 col1.metric("Status", detail["status"])
                 col2.metric("Decision Type", detail["decision_type"])
                 col3.metric("Policy Used", detail["policy_version_used"])
-                
+
                 st.divider()
-                
-                # Context and Results
+
                 colA, colB = st.columns(2)
                 with colA:
                     st.subheader("Input Context")
@@ -223,10 +260,9 @@ elif view == "Decision Detail":
                 with colB:
                     st.subheader("Output Result")
                     st.json(detail["output_result"])
-                
+
                 st.divider()
 
-                # Explanation and Execution Metadata
                 colC, colD = st.columns(2)
                 with colC:
                     st.subheader("🧠 Structured Explanation")
@@ -249,8 +285,7 @@ elif view == "Decision Detail":
                         st.write("No metadata available.")
 
                 st.divider()
-                
-                # Audit Logs
+
                 st.subheader("Audit Logs")
                 if detail["audit_logs"]:
                     log_data = []
@@ -263,7 +298,7 @@ elif view == "Decision Detail":
                     st.table(log_data)
                 else:
                     st.write("No audit logs found for this decision.")
-                    
+
             elif response.status_code == 404:
                 st.warning("Decision not found.")
             else:
