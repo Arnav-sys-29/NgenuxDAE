@@ -5,7 +5,11 @@ import json
 from datetime import datetime
 
 # Configure the page
-st.set_page_config(page_title="Ngenux DAE Manager", layout="wide")
+st.set_page_config(
+    page_title="Ngenux DAE Manager",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
 # Backend API URL — overridden by API_BASE_URL env var in Docker
 API_BASE_URL = os.environ.get("API_BASE_URL", "http://localhost:8000")
