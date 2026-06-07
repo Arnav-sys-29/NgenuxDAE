@@ -54,7 +54,6 @@ def apply_custom_css():
             }
 
             #MainMenu {visibility: hidden;}
-            header {visibility: hidden;}
             footer {visibility: hidden;}
 
             /* Hide sidebar collapse/expand button */
